@@ -11,6 +11,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import ControlPanel from './controlPanel.vue';
 
+// scene need to be accessible from the control panels
+// should the scene be a prop? or a store? 
+
 export default {
   name: 'BasicScene',
   props: {
@@ -39,14 +42,15 @@ export default {
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
 
-    // Create a grid of cubes
+
+    // should be ablee to add objects to the scene from another component,
+    // which means scene should be a global object
+    
+    // Create grid of cubes
     const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
     const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-
     const dataWidth = 10;
     const dataHeight = 10;
-    
-    // Create a 5x5 grid of cubes
     for (let x = -dataWidth / 2; x <= dataWidth / 2; x++) {
       for (let y = -dataHeight / 2; y <= dataHeight / 2; y++) {
         const cube = new THREE.Mesh(geometry, material);
