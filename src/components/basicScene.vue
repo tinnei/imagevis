@@ -22,38 +22,45 @@ export default {
   mounted() {
     // Create scene
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 5;
 
+    // Set up camera position to view all cubes
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 15;
+    
+    // set up renderer
     const renderer = new THREE.WebGLRenderer({
       canvas: document.getElementById('canvas'),
       antialias: true
     });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    // set up controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.1;
 
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
+    // Create a grid of cubes
+    const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
 
-    const gui = new GUI();
-    const cubeParams = {
-      size: 1,
-      rotationSpeed: 0.01
-    };
-    gui.add(cubeParams, 'size', 1, 10).name('Cube Size');
-    gui.add(cubeParams, 'rotationSpeed', 0, 0.05).name('Rotation Speed');
+    const dataWidth = 10;
+    const dataHeight = 10;
+    
+    // Create a 5x5 grid of cubes
+    for (let x = -dataWidth / 2; x <= dataWidth / 2; x++) {
+      for (let y = -dataHeight / 2; y <= dataHeight / 2; y++) {
+        const cube = new THREE.Mesh(geometry, material);
+        cube.position.set(x, y, 0);
+        scene.add(cube);
+      }
+    }
 
     // Add lights
     const ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
-
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 1, 1);
     scene.add(directionalLight);
-
     const pointLight = new THREE.PointLight(0xffffff, 1, 100);
     pointLight.position.set(0, 5, 0);
     scene.add(pointLight);
