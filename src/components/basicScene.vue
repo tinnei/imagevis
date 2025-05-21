@@ -1,5 +1,6 @@
 <template>
   <div class="fullScreen">
+    <DataPanel />
     <canvas id="canvas"></canvas> 
     <ControlPanel />
   </div>
@@ -10,7 +11,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import ControlPanel from './controlPanel.vue';
-
+import DataPanel from './dataPanel.vue';
+import Stats from 'stats.js';
 // scene need to be accessible from the control panels
 // should the scene be a prop? or a store? 
 
@@ -20,7 +22,8 @@ export default {
     msg: String
   },
   components: {
-    ControlPanel
+    ControlPanel,
+    DataPanel
   },
   mounted() {
     // Create scene
@@ -42,6 +45,11 @@ export default {
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
 
+  // Add stats.js
+    const stats = new Stats();
+    document.body.appendChild(stats.dom);
+    stats.dom.style.left = 'auto';
+    stats.dom.style.right = '0px';
 
     // should be ablee to add objects to the scene from another component,
     // which means scene should be a global object
@@ -74,6 +82,7 @@ export default {
       requestAnimationFrame(animate);
       controls.update();
       renderer.render(scene, camera);
+      stats.update();
     }
     animate();
     
