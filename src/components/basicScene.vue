@@ -28,11 +28,11 @@ function getPixelColor(imageData, x, y) {
 }
 
 // Function to create planes with colors from image
-async function createColoredPlanes(scene) {
+async function createColoredPlanes(scene, imgSrc) {
   try {
     console.log("I'm here----[createColoredPlanes]");
     const img = new Image();
-    img.src = require("@/assets/data/sample/24p.png");
+    img.src = imgSrc;
     
     await new Promise((resolve, reject) => {
       img.onload = resolve;
@@ -105,7 +105,8 @@ export default {
     stats.dom.style.left = 'auto';
     stats.dom.style.right = '0px';
 
-    createColoredPlanes(scene);
+    // REFACTOR: display sample image - this should be triggered by button intead
+    createColoredPlanes(scene, require("@/assets/data/sample/24p.png"));
     
     // Add lights
     const ambientLight = new THREE.AmbientLight(0x404040);
