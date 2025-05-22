@@ -13,9 +13,63 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import ControlPanel from './controlPanel.vue';
 import DataPanel from './dataPanel.vue';
 import Stats from 'stats.js';
+
+// Function to read pixel data from ImageData
+function getPixelColor(imageData, x, y) {
+  const { width, data } = imageData;
+  const index = (y * width + x) * 4;
+  
+  return {
+    r: data[index],
+    g: data[index + 1],
+    b: data[index + 2],
+    a: data[index + 3]
+  };
+}
+
+// Function to create planes with colors from image
+async function createColoredPlanes(scene) {
+  try {
+    console.log("I'm here----[createColoredPlanes]");
+    const img = new Image();
+    img.src = require("@/assets/data/sample/24p.png");
+    
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+    const { width, height } = imageData;
+    
+    const geometry = new THREE.PlaneGeometry(0.5, 0.5);
+    
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pixel = getPixelColor(imageData, x, y);
+        const material = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(pixel.r/255, pixel.g/255, pixel.b/255),
+          side: THREE.FrontSide,
+        });
+        
+        const plane = new THREE.Mesh(geometry, material);
+        plane.position.set(x - width/2, -y + height/2, 0);
+        scene.add(plane);
+      }
+    }
+  } catch (error) {
+    console.error('Error loading image:', error);
+  }
+}
+
+
 // scene need to be accessible from the control panels
 // should the scene be a prop? or a store? 
-
 export default {
   name: 'BasicScene',
   props: {
@@ -31,7 +85,7 @@ export default {
 
     // Set up camera position to view all cubes
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 15;
+    camera.position.z = 20;
     
     // set up renderer
     const renderer = new THREE.WebGLRenderer({
@@ -51,22 +105,8 @@ export default {
     stats.dom.style.left = 'auto';
     stats.dom.style.right = '0px';
 
-    // should be ablee to add objects to the scene from another component,
-    // which means scene should be a global object
+    createColoredPlanes(scene);
     
-    // Create grid of cubes
-    const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    const material = new THREE.MeshPhongMaterial({ color: 0xffffff });
-    const dataWidth = 10;
-    const dataHeight = 10;
-    for (let x = -dataWidth / 2; x <= dataWidth / 2; x++) {
-      for (let y = -dataHeight / 2; y <= dataHeight / 2; y++) {
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(x, y, 0);
-        scene.add(cube);
-      }
-    }
-
     // Add lights
     const ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
