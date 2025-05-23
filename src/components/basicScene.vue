@@ -9,11 +9,11 @@
 <script>
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import ControlPanel from './controlPanel.vue';
 import DataPanel from './dataPanel.vue';
 import Stats from 'stats.js';
 
+// REFACTOR: move these functions into a separate file
 // Function to read pixel data from ImageData
 function getPixelColor(imageData, x, y) {
   const { width, data } = imageData;
@@ -67,7 +67,6 @@ async function createColoredPlanes(scene, imgSrc) {
   }
 }
 
-
 // scene need to be accessible from the control panels
 // should the scene be a prop? or a store? 
 export default {
@@ -78,6 +77,16 @@ export default {
   components: {
     ControlPanel,
     DataPanel
+  },
+  data() {
+    return {
+      isPerspectiveView: true,
+      camera: null,
+      scene: null,
+      renderer: null,
+      controls: null,
+      stats: null
+    }
   },
   mounted() {
     // Create scene
@@ -99,7 +108,7 @@ export default {
     controls.enableDamping = true;
     controls.dampingFactor = 0.1;
 
-  // Add stats.js
+    // Add stats.js
     const stats = new Stats();
     document.body.appendChild(stats.dom);
     stats.dom.style.left = 'auto';
@@ -132,6 +141,20 @@ export default {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Handle keyboard events for camera switching
+    window.addEventListener('keydown', (event) => {
+      switch(event.key) {
+        case '1':
+          camera.position.set(0, 0, 20);
+          camera.lookAt(0, 0, 0);
+          break;
+        case '2':
+          camera.position.set(20, 0, 20);
+          camera.lookAt(0, 0, 0);
+          break;
+      }
     });
   }
 }
