@@ -12,6 +12,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import ControlPanel from './controlPanel.vue';
 import DataPanel from './dataPanel.vue';
 import Stats from 'stats.js';
+import { useCounterStore } from '@/stores/counter'
 
 // REFACTOR: move these functions into a separate file
 // Function to read pixel data from ImageData
@@ -80,6 +81,7 @@ export default {
   },
   data() {
     return {
+      counterStore: useCounterStore(),
       isPerspectiveView: true,
       camera: null,
       scene: null,
@@ -87,6 +89,8 @@ export default {
       controls: null,
       stats: null
     }
+  },
+  setup() {
   },
   mounted() {
     // Create scene
